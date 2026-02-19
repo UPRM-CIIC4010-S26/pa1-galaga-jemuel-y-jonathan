@@ -17,8 +17,8 @@ Program::Program() {
         });
 
     for (int i = 0; i < 30; i++) {
-        float x = 250 + 50 * i;
-        float y = 200 + 50 * i;
+        float x = 250 + 50 * (i % 10); //Cuando 10%10 eso va a dar a cero provocando que empiece en 250 de nuevo
+        float y = 200 + 50 * (i / 10); //Hace que empiece en 0 primero despues en uno y despues en dos gracias al integer division que elimina la parte decimal
 
         Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {
             std::pair<float, float>{x, y}, 
@@ -56,10 +56,15 @@ void Program::Update() {
         }
 
         for (Projectile& p : Projectile::projectiles) { 
-            p.update(); 
+            p.update();
 
+            if (p.ID != 0){//Si el proyectil no es del jugador osea no es 0 se sigue al siguiente filtro
+                if (HitBox::Collision(player->hitBox, p.getHitBox())){//Si el hitbox del jugador y el proyectil colisionan entonces entramos en el bloque del if
+                PlayerReset();
+                break;
+            }
         }
-
+    }
         if (lives <= 0 && pauseFrames <= 0) gameOver = true;
         Projectile::CleanProjectiles();
         Projectile::ProjectileCollision();
@@ -180,6 +185,25 @@ void Program::PlayerReset() {
 
 void Program::Reset() {
     Enemy::enemies.clear();
+    Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {
+            std::pair<float, float>{350, 150}, 
+            new SpEnemy(350, 150)
+        });
+
+    Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {
+            std::pair<float, float>{600, 150}, 
+            new SpEnemy(600, 150)
+        });
+
+    for (int i = 0; i < 30; i++) {
+        float x = 250 + 50 * (i % 10); //Cuando 10%10 eso va a dar a cero provocando que empiece en 250 de nuevo
+        float y = 200 + 50 * (i / 10); //Hace que empiece en 0 primero despues en uno y despues en dos gracias al integer division que elimina la parte decimal
+
+        Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {
+            std::pair<float, float>{x, y}, 
+            new StdEnemy(x, y)
+        });
+    }
     StdEnemy::attackInProgress = false;
     player = new Player((GetScreenWidth() / 2) - 15, GetScreenHeight() * 0.75f);
     respawnCooldown = 1080;
