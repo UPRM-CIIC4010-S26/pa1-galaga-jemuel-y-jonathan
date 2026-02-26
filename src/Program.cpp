@@ -1,5 +1,10 @@
 #include "Program.hpp"
 
+
+
+int Program::score = 0;
+
+
 Program::Program() {
     Background::sideWalls = std::pair<HitBox, HitBox>{ 
         HitBox(0, 0, 10, GetScreenHeight()), 
@@ -52,8 +57,9 @@ void Program::Update() {
                 p.second->health = 0;
                 pauseFrames = 120;
                 lives--;
+                }
             }
-        }
+        
 
         for (Projectile& p : Projectile::projectiles) { 
             p.update();
@@ -62,12 +68,18 @@ void Program::Update() {
                 if (HitBox::Collision(player->hitBox, p.getHitBox())){//Si el hitbox del jugador y el proyectil colisionan entonces entramos en el bloque del if
                 PlayerReset();
                 break;
+                }
             }
         }
-    }
+    
         if (lives <= 0 && pauseFrames <= 0) gameOver = true;
         Projectile::CleanProjectiles();
         Projectile::ProjectileCollision();
+        while (Program::score >= nextLifeScore && lives < 5) {
+            lives++;
+            nextLifeScore += 1000;
+}
+        
     }
 }
 
@@ -81,6 +93,7 @@ void Program::Draw() {
                    Rectangle{10.0f + i * 30, GetScreenHeight() - 30.0f, 20, 20}, 
                    Vector2{0, 0}, 0, WHITE);
     }
+    DrawText(TextFormat("Score: %i", Program::score), 10, 10, 24, WHITE);
 
 
     for (Projectile p : Projectile::projectiles) p.draw();
@@ -157,7 +170,10 @@ void Program::KeyInputs() {
     if (!paused && !startup && IsKeyPressed('O')) gameOver = !gameOver;
     if (!gameOver && !paused && IsKeyPressed('I')) startup = !startup;
     if (IsKeyPressed('H')) HitBox::drawHitbox = !HitBox::drawHitbox;
-    
+
+    if (!startup && !paused && !gameOver && IsKeyPressed(KEY_K)) {
+        Program::score += 500; 
+    }
     if (gameOver && IsKeyPressed(KEY_ENTER)) {
         gameOver = false;
         Reset();
@@ -203,6 +219,7 @@ void Program::Reset() {
             std::pair<float, float>{x, y}, 
             new StdEnemy(x, y)
         });
+    
     }
     StdEnemy::attackInProgress = false;
     player = new Player((GetScreenWidth() / 2) - 15, GetScreenHeight() * 0.75f);
@@ -211,4 +228,7 @@ void Program::Reset() {
     count = 0;
     delay = 0;
     lives = 3;
+
+    Program::score = 0;
+    nextLifeScore = 1000;
 }
