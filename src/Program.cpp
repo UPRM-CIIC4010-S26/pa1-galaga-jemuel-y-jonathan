@@ -61,23 +61,31 @@ void Program::Update() {
             }
         
 
-        for (Projectile& p : Projectile::projectiles) { 
-            p.update();
+        bool playerWasHit = false; //variable para saber cuando le dan y cuando no
 
-            if (p.ID != 0){//Si el proyectil no es del jugador osea no es 0 se sigue al siguiente filtro
-                if (HitBox::Collision(player->hitBox, p.getHitBox())){//Si el hitbox del jugador y el proyectil colisionan entonces entramos en el bloque del if
-                PlayerReset();
+        for (Projectile& p : Projectile::projectiles) { 
+        p.update();
+
+        if (p.ID != 0) { // Si el ID no es 0, significa que el proyectil es de un enemigo
+            if (HitBox::Collision(player->hitBox, p.getHitBox())) {
+                playerWasHit = true;
                 break;
-                }
-            }
         }
+    }
+}
+
+if (playerWasHit) {
+    PlayerReset();
+}
     
         if (lives <= 0 && pauseFrames <= 0) gameOver = true;
         Projectile::CleanProjectiles();
         Projectile::ProjectileCollision();
-        while (Program::score >= nextLifeScore && lives < 5) {
-            lives++;
-            nextLifeScore += 1000;
+        while (Program::score >= nextLifeScore) {
+    if (lives < 5) {
+        lives++;
+    }
+    nextLifeScore += 1000;
 }
         
     }
@@ -107,22 +115,30 @@ void Program::Draw() {
 void Program::ManageEnemyRespawns() {
     delay = std::max(delay - 1, 0);
 
-    respawnCooldown -= 1;
-    if (respawnCooldown <= 0) {
-        respawnCooldown = 1080;
+    int difficultyIncrease = Program::score / 2000; // aumenta la dificultad cada 2000 puntos
+    
+    if (difficultyIncrease > 4) difficultyIncrease = 4; // limite para que la dificultad no se exagere
+respawnCooldown -= 1 + difficultyIncrease; // mas score = mas dificultad =  mas rapido reaparecen los enemigos    
+    
+if (respawnCooldown <= 0) {   
+
+    respawnCooldown = 1080;
         for (std::pair<std::pair<float, float>, Enemy*>& p : Enemy::enemies) {
+
             if (!p.second && p.first.second != 150) {
                 int eType = GetRandomValue(1, 3);
 
                 if (eType == 1) {
                     p.second = new StEnemy(GetScreenWidth() / 2 - 15, 0, true);
                     respawnCooldown /= 2;
+
                 } else {
                     p.second = new StdEnemy(GetScreenWidth() / 2 - 15, 0, true);
                 }
 
                 respawns++;
                 break;
+                
             } else if (!p.second && p.first.second == 150) {
                 p.second = new SpEnemy(GetScreenWidth() / 2 - 15, 0, true);
                 respawns++;

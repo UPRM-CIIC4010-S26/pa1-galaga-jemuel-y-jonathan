@@ -5,6 +5,7 @@
 #include "Animation.hpp"
 #include <iostream>
 
+
 class Enemy {
     protected:
         float angle = 90;
