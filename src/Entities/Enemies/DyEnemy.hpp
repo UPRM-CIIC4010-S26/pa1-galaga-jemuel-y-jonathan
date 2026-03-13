@@ -10,7 +10,7 @@ class DyEnemy : public Enemy {
 
     public:
         DyEnemy(float x, float y) : Enemy(x, y) {
-            if (GetRandomValue(1, 2) == 0){
+            if (GetRandomValue(1, 2) == 1){
                 this->skinType = Rectangle{2, 128, 13, 14};
             }else{
                 this->skinType = Rectangle{2, 147, 13, 13};
