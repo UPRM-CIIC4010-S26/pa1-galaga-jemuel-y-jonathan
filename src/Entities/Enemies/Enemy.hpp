@@ -14,6 +14,7 @@ class Enemy {
         bool spawning = false;
         bool frame = false;
         int frameCooldown = 30;
+        int scoreValue = 0;
         
     public:
         int health = 1;
@@ -44,8 +45,11 @@ class Enemy {
                 frameCooldown = 30;
              }
         }
+        int getScore(){
+            return scoreValue;
+        }
 
-        static void ManageEnemies(HitBox target) {
+        static void ManageEnemies(HitBox target, int &score) {
             for (std::pair<std::pair<float, float>, Enemy*>& p : Enemy::enemies) {
                 p.first.first += (p.first.first == 0) ? 0 : direction;
                 if (p.second) {
@@ -59,6 +63,7 @@ class Enemy {
                     }
 
                     if (p.second->health <= 0) {
+                        score += p.second->getScore();
                         Animation::animations.push_back(
                             Animation(p.second->position.first, p.second->position.second, 155, 0, 33, 33, 30, 30, 4, ImageManager::SpriteSheet)
                         );

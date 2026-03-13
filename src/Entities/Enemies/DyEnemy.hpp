@@ -17,6 +17,7 @@ class DyEnemy : public Enemy {
             }
             this->cooldown = GetRandomValue(90, 300);
             this->health = 1; 
+            this->scoreValue = 200;
         }
 
         void draw() override;

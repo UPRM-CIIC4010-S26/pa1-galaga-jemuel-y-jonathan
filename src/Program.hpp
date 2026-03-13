@@ -27,7 +27,7 @@ class Program {
         bool gameOver = false;
 
     public:
-        static int score;
+        int score = 0;
         Program();
         
         void Update();
